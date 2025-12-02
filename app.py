@@ -73,4 +73,25 @@ def track_click(campaign_id, recipient_hash):
 @app.route("/landing.html")
 def landing_page():
     return """
-    <h1>Phis
+    <h1>Phishing Simulation Training</h1>
+    <p>This was a <b>test phishing email</b>. Stay alert:</p>
+    <ul>
+    <li>Don’t click unknown links</li>
+    <li>Check sender email address</li>
+    <li>Don’t share passwords</li>
+    <li>Report suspicious emails</li>
+    </ul>
+    """
+
+@app.route("/report")
+def report():
+    conn = sqlite3.connect(DB_FILE)
+    cur = conn.cursor()
+    cur.execute("SELECT event_type, COUNT(*) FROM events GROUP BY event_type")
+    rows = cur.fetchall()
+    conn.close()
+    return dict(rows)
+
+if __name__ == "__main__":
+    init_db()
+    app.run(host="0.0.0.0", port=5000)
