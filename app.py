@@ -26,6 +26,23 @@ def init_db():
     conn.commit()
     conn.close()
 
+# -----------------------------
+# HOME PAGE (Fixes your 404)
+# -----------------------------
+@app.route("/")
+def home():
+    return """
+    <h1>Phishing Simulation Server</h1>
+    <p>Status: <b>Running</b></p>
+    <p>Available endpoints:</p>
+    <ul>
+        <li>/track/open/&lt;campaign&gt;/&lt;recipient&gt;.gif</li>
+        <li>/track/click/&lt;campaign&gt;/&lt;recipient&gt;</li>
+        <li>/landing.html</li>
+        <li>/report</li>
+    </ul>
+    """
+
 def log_event(campaign_id, recipient_hash, event_type):
     ua = request.headers.get('User-Agent', '')
     ip = request.remote_addr or "0.0.0.0"
@@ -44,7 +61,7 @@ def log_event(campaign_id, recipient_hash, event_type):
 def track_open(campaign_id, recipient_hash):
     log_event(campaign_id, recipient_hash, "open")
 
-    # 1x1 pixel
+    # 1x1 pixel tracking gif
     gif = b'GIF89a\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\xff\xff\xff!\xf9\x04\x01\x00\x00\x00\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02D\x01\x00;'
     return send_file(io.BytesIO(gif), mimetype="image/gif")
 
@@ -56,25 +73,4 @@ def track_click(campaign_id, recipient_hash):
 @app.route("/landing.html")
 def landing_page():
     return """
-    <h1>Phishing Simulation Training</h1>
-    <p>This was a test phishing email. Learn how to stay safe:</p>
-    <ul>
-    <li>Never click unknown links</li>
-    <li>Check the sender address</li>
-    <li>Do not share passwords</li>
-    <li>Report suspicious emails</li>
-    </ul>
-    """
-
-@app.route("/report")
-def report():
-    conn = sqlite3.connect(DB_FILE)
-    cur = conn.cursor()
-    cur.execute("SELECT event_type, COUNT(*) FROM events GROUP BY event_type")
-    rows = cur.fetchall()
-    conn.close()
-    return dict(rows)
-
-if __name__ == "__main__":
-    init_db()
-    app.run(host="0.0.0.0", port=5000)
+    <h1>Phis
